@@ -17,6 +17,8 @@ interface SudokuState {
   maxMistakes: number;
   tip:number;
   themeColor: string;
+  isDarkMode: boolean;  // Estado del tema
+  toggleDarkMode: () => void;  // Función para cambiar el tema
   resetCurrentGame: () => void;
   pausedTime: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
@@ -52,6 +54,8 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
   isPaused: false,
   tip:3,
   themeColor: '#4CAF50',
+  isDarkMode: true,
+  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
 
   setDifficulty: (difficulty) => {
     set({ difficulty });

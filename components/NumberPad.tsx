@@ -5,13 +5,14 @@ import { useSudokuStore } from '../store/sudokuStore';
 export function NumberPad() {
   const setNumber = useSudokuStore(state => state.setNumber);
   const themeColor = useSudokuStore(state => state.themeColor);
-
+  const isDarkMode = useSudokuStore(state => state.isDarkMode);
+   const containeer = isDarkMode ? "#1a1a1a" : "#ddd";
   return (
     <View style={styles.container}>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(number => (
         <TouchableOpacity
           key={number}
-          style={styles.button}
+          style={[styles.button, { backgroundColor: containeer }]}
           onPress={() => setNumber(number)}>
           <Text style={[styles.buttonText, { color: themeColor }]}>{number}</Text>
         </TouchableOpacity>

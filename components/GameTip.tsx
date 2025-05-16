@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useSudokuStore } from '../store/sudokuStore';
 import { SudokuGrid } from './SudokuGrid';
-import Icon from 'react-native-vector-icons/Ionicons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 export function GameTip() {
   const solveOneEmptyCell = useSudokuStore(state => state.solveOneEmptyCell);
@@ -21,7 +21,7 @@ export function GameTip() {
           }}
           disabled={tip === 0}
         >
-          <Icon name= "lightbulb-outline" size={24}  />
+          <FontAwesome5 name="lightbulb" size={24} color="black" />
         </TouchableOpacity>
         {tip > 0 && (
           <View style={styles.tipBadge}>

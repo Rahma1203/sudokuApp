@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Switch, useColorScheme } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Switch } from 'react-native';
 import { SudokuGrid } from '../../components/SudokuGrid';
 import { NumberPad } from '../../components/NumberPad';
 import { GameStats} from '../../components/GameStats';
@@ -10,10 +10,8 @@ import { GameAnimation } from '../../components/GameAnimation';
  
 
 export default function GameScreen() {
-  const {timer, newGame, difficulty, isPaused, pausedTime, mistakes, maxMistakes, resetCurrentGame, checkMistakes,  isComplete, themeColor } = useSudokuStore();
+  const {timer, newGame, difficulty, isPaused, pausedTime, mistakes, maxMistakes, resetCurrentGame, checkMistakes,  isComplete, themeColor, isDarkMode } = useSudokuStore();
   const [showRetry, setShowRetry] = useState(false);
-  const {colorScheme, toggleColorScheme} = useColorScheme()
-
 
   useEffect(() => {
     newGame();
@@ -22,33 +20,22 @@ export default function GameScreen() {
   useEffect(() => {
     if (mistakes >= maxMistakes) {
       setShowRetry(true) ;
-      
-      
     }
   }, [mistakes, maxMistakes]);
   const handleRetry = () => {
     resetCurrentGame();
     setShowRetry(false);
   };
-  // useEffect(() => {
-  //    let interval: NodeJS.Timeout | undefined;
-  //    if (!isPausedByMistakes && !isComplete) {
-  //      interval = setInterval(() => {
-  //        useSudokuStore.getState().incrementTimer();
-  //      }, 1000);
-  //    }
-  //    return () => {
-  //      if (interval) clearInterval(interval);
-  //    };
-  //  }, [isPausedByMistakes, isComplete]);
-  //Pausar el tiempo cuando 
 
+  const backgroundColor = isDarkMode ? '#121212' : '#FFFFFF';
+  const textColor = isDarkMode ? '#FFFFFF' : '#000000';
+  const subtitleColor = isDarkMode ? '#888' : '#444';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor }]}>
       {showRetry && (
         <View style={[styles.container, styles.overlay]}>
-          <Text style={styles.resumeText}>Has alcanzado el máximo de errores.</Text>
+          <Text style={[styles.resumeText, { color: textColor }]}>Has alcanzado el máximo de errores.</Text>
           <TouchableOpacity onPress={handleRetry} style={[styles.retryButton, { backgroundColor: themeColor }]}>
             <Text style={styles.retryText}>Reintentar</Text>
           </TouchableOpacity>
@@ -58,12 +45,9 @@ export default function GameScreen() {
       <View style={styles.headerContent}>
         <View style={styles.header}>
         <Text style={[styles.title, { color: themeColor }]}>Sudoku</Text>
-        <Text style={styles.subtitle}>{difficulty.toUpperCase()}</Text>
+        <Text style={[styles.subtitle, { color: subtitleColor }]}>{difficulty.toUpperCase()}</Text>
         </View>
         <GameTip />
-      </View>
-      <View className='flex-row items-center justify-center white:bg-white'>
-        <Switch value={colorScheme === 'white'} onValueChange={toggleColorScheme} ></Switch>
       </View>
       <GameStats />
       <View style={styles.gridContainer}>
@@ -71,20 +55,13 @@ export default function GameScreen() {
         <GameAnimation />
       </View>
       <NumberPad />
-      {/* <TouchableOpacity style={[styles.newGameButton, { backgroundColor: themeColor }]} onPress={newGame}>
-        <RefreshCw size={24} color="#fff" />
-        <Text style={styles.newGameText}>New Game</Text>
-      </TouchableOpacity> */}
       {isPaused && !showRetry && (
         <View style={styles.overlay}>
           <TouchableOpacity onPress={pausedTime} style={[styles.resumeButton, { backgroundColor: themeColor }]}>
-          <Text style={styles.pausedText}>Reanudar</Text>
+          <Text style={[styles.pausedText, { color: textColor }]}>Reanudar</Text>
           </TouchableOpacity>
         </View>
       )}
-
-      
-      
     </View>
   );
 }
@@ -95,7 +72,6 @@ export default function GameScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
     paddingTop: 48,
   },
   resumeButton: {
@@ -106,7 +82,6 @@ const styles = StyleSheet.create({
     margin: 16,
   },
   resumeText: {
-    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -140,24 +115,13 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
   },
   gridContainer: {
     alignItems: 'center',
     marginVertical: 16,
   },
-  newGameButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
-  },
-  newGameText: {
-    color: '#fff',
-    fontSize: 16,
+  pausedText: {
+    fontSize: 32,
     fontWeight: 'bold',
   },
   overlay: {
@@ -171,9 +135,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
-  pausedText: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
-  }
 });

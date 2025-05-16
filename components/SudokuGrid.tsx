@@ -1,34 +1,47 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useSudokuStore } from '../store/sudokuStore';
-
-
+import { Background } from '@react-navigation/elements';
 
 export function SudokuGrid() {
-  const { currentGrid, puzzle, selectedCell, selectCell } = useSudokuStore();
+  const { currentGrid, puzzle, selectedCell, selectCell, isDarkMode } = useSudokuStore();
+  
+  // Colores dinámicos basados en el modo
+  const containerColor = isDarkMode ? "#1a1a1a" : "#f5f5f5";
+  const highlightColor = isDarkMode ? "#333" : "#e0e0e0";
+  const selectedColor = isDarkMode ? "#444" : "#d0d0d0";
+  const gridBackgroundColor = isDarkMode ? "#2a2a2a" : "#cccccc";
+  const numberColor = isDarkMode ? "#4CAF50" : "#4CAF50";
+  const originalNumberColor = isDarkMode ? "#888" : "#555";
 
   const renderCell = (row: number, col: number) => {
-    const value = currentGrid[row][col]; // Valor actual de la celda
+    const value = currentGrid[row][col];
     const isOriginal = puzzle[row][col] !== 0;
     const isSelected = selectedCell?.row === row && selectedCell?.col === col;
-    const isSelectedRow = selectedCell?.row === row; //Fila de la celda seleccionada 
-    const isSelectedCol = selectedCell?.col === col; // Comprobar si la celda seleccionada está en la misma columna
-
+    const isSelectedRow = selectedCell?.row === row;
+    const isSelectedCol = selectedCell?.col === col;
+    
     return (
       <TouchableOpacity
         key={`${row}-${col}`}
         style={[
           styles.cell,
-          isSelected && styles.selectedCell, // Estilo para la celda seleccionada
-          isSelectedRow && !isSelected && styles.rowCell, // Estilo para la fila de la celda selcccionada
-          isSelectedCol && !isSelected && styles.colCell, // Estilo para la columna de la celda seleccionada
-          isOriginal && (isSelected || isSelectedRow || isSelectedCol) && styles.origin,
+          { backgroundColor: containerColor },
+          isSelected && { backgroundColor: selectedColor },
+          (isSelectedRow || isSelectedCol) && !isSelected && { backgroundColor: highlightColor },
+          isOriginal && (isSelected || isSelectedRow || isSelectedCol) && { backgroundColor: isDarkMode ? '#333' : '#d6d6d6' },
           (row + 1) % 3 === 0 && styles.bottomBorder,
           (col + 1) % 3 === 0 && styles.rightBorder,
         ]}
         onPress={() => selectCell(row, col)}
         disabled={isOriginal}>
-        <Text style={[styles.cellText, isOriginal && styles.originalText]}> 
+        <Text 
+          style={[
+            styles.cellText, 
+            { color: numberColor },
+            isOriginal && { color: originalNumberColor, fontWeight: 'bold' }
+          ]}
+        > 
           {value !== 0 ? value.toString() : ''}
         </Text>
       </TouchableOpacity>
@@ -36,25 +49,20 @@ export function SudokuGrid() {
   };
 
   return (
-    <View style={styles.grid}>
+    <View style={[styles.grid, { backgroundColor: gridBackgroundColor }]}>
       {Array(9).fill(null).map((_, row) => (
         <View key={row} style={styles.row}>
           {Array(9).fill(null).map((_, col) => renderCell(row, col))}
         </View>
       ))}
-      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   grid: {
-    backgroundColor: '#2a2a2a',
     padding: 1,
     borderRadius: 8,
-  },
-  origin: {
-    backgroundColor: '#333',
   },
   row: {
     flexDirection: 'row',
@@ -64,20 +72,7 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
     margin: 1,
-  },
-  selectedCell: {
-    backgroundColor: '#444',
-  },
-  rowCell: {
-    backgroundColor: '#333', // Color para las celdas de la fila seleccionada
-  },
-  colCell: {
-    backgroundColor: '#333', // Color para las celdas de la columna seleccionada
-  },
-  originalCell: {
-    backgroundColor: '#252525',
   },
   bottomBorder: {
     marginBottom: 3,
@@ -86,11 +81,6 @@ const styles = StyleSheet.create({
     marginRight: 3,
   },
   cellText: {
-    color: '#4CAF50',
     fontSize: 18,
-  },
-  originalText: {
-    color: '#888',
-    fontWeight: 'bold',
-  },
+  }
 });

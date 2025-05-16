@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 
 export function GameStats() {
-  const { timer, mistakes, maxMistakes, isComplete, isPaused, pausedTime,themeColor} = useSudokuStore();
+  const { timer, mistakes, maxMistakes, isComplete, isPaused, pausedTime,themeColor,isDarkMode} = useSudokuStore();
 
 
   useEffect(() => {
@@ -28,12 +28,12 @@ export function GameStats() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  
+  const containeer = isDarkMode ? "#1a1a1a" : "#ddd";
 
   
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,  { backgroundColor: containeer }]}>
       <View style={styles.stat}>
         <Text style={styles.label}>Mistakes</Text>
         <View style={styles.mistakesContainer}>
