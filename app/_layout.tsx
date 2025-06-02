@@ -11,12 +11,19 @@ export default function RootLayout() {
   return (
     <>
       <Stack>
-        <Stack.Screen 
-          name="(tabs)" 
-          options={{ 
+        <Stack.Screen
+          name="(tabs)"
+          options={{
             headerShown: false,
             title: 'Sudoku'
-          }} 
+          }}
+        />
+        <Stack.Screen
+          name="statistics"
+          options={{
+            title: 'Statistics',
+            headerShown: true
+          }}
         />
         <Stack.Screen name="+not-found" options={{ title: 'Oops!' }} />
       </Stack>

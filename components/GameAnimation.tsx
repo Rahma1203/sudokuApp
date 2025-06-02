@@ -7,11 +7,12 @@ export function GameAnimation() {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [showAnimation, setShowAnimation] = useState(false);
   const {difficulty} = useSudokuStore();
+  const {themeColor, isDarkMode} = useSudokuStore();
 
   useEffect(() => {
     if (lastCorrectCell) {
         if (difficulty === 'easy') {
-            fadeAnim.setValue(10); // Reset opacity for easy difficulty
+            fadeAnim.setValue(10); 
           } else if  (difficulty === "medium"){
               fadeAnim.setValue(20);
           } else if (difficulty === "hard"){
@@ -49,7 +50,7 @@ export function GameAnimation() {
 
   return (
     <Animated.View style={[styles.animationContainer, { top, left, opacity: fadeAnim }]}>
-      <View style={styles.bubble}>
+      <View style={[styles.bubble, { backgroundColor: themeColor }]}>
         <Text style={styles.text}>{pointsText}</Text>
       </View>
     </Animated.View>

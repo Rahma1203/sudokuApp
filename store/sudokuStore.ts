@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { Difficulty, SudokuGrid, generateSudoku, checkSolution, isCellValid} from '../utils/sudoku';
 
@@ -10,15 +11,17 @@ interface SudokuState {
   mistakes: number;
   lastCorrectCell: { row: number; col: number } | null;
   points: number;
-  
+  totalScore: number;
+  setTotalScore: (score: number) => void;
   timer: number;
   isComplete: boolean;
   isPaused: boolean;
   maxMistakes: number;
   tip:number;
   themeColor: string;
-  isDarkMode: boolean;  // Estado del tema
-  toggleDarkMode: () => void;  // Función para cambiar el tema
+  isDarkMode: boolean;
+  gameOver: boolean; // Nuevo estado para controlar cuando se acaban los intentos
+  toggleDarkMode: () => void;
   resetCurrentGame: () => void;
   pausedTime: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
@@ -31,6 +34,7 @@ interface SudokuState {
   checkCompletion: () => void;
   checkMistakes: () => void;
   solveOneEmptyCell: () => void;
+  applyPenalty: () => Promise<void>; // Nueva función para aplicar penalización
 }
 
 // Create initial empty grid
@@ -52,10 +56,13 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
   points: 0,
   isComplete: false,
   isPaused: false,
+  gameOver: false,
   tip:3,
   themeColor: '#4CAF50',
   isDarkMode: true,
   toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+  totalScore: 0,
+  setTotalScore: (score: number) => set({ totalScore: score }),
 
   setDifficulty: (difficulty) => {
     set({ difficulty });
@@ -76,13 +83,12 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
       mistakes: 0,
       points: 0,
       timer: 0,
-      
       isComplete: false,
+      gameOver: false,
+      isPaused: false,
       tip:3,
     });
   },
-  
-  
 
   resetCurrentGame: () => {
     const { puzzle } = get();
@@ -92,6 +98,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
       mistakes: 0,
       points: 0,
       isComplete: false,
+      gameOver: false,
       timer: 0,
       tip: 3,
       isPaused: false,
@@ -99,14 +106,14 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
   },
 
   selectCell: (row, col) => {
-    if (get().puzzle[row][col] === 0) {
+    if (get().puzzle[row][col] === 0 && !get().gameOver) {
       set({ selectedCell: { row, col } });
     }
   },
 
   setNumber: (number) => {
-    const { selectedCell, currentGrid, solution, difficulty, points } = get();
-    if (!selectedCell) return; // Si no hay celda seleccionada, no hacer nada
+    const { selectedCell, currentGrid, solution, difficulty, points, gameOver } = get();
+    if (!selectedCell || gameOver) return;
 
     const { row, col } = selectedCell; 
     
@@ -126,40 +133,67 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
       });
     } else {
       if(!isCellValid(currentGrid, row, col, number)){
-        if(get().mistakes < get().maxMistakes){set(state => ({ mistakes: state.mistakes + 1 }))}; 
-        get().checkMistakes(); //
+        if(get().mistakes < get().maxMistakes){
+          set(state => ({ mistakes: state.mistakes + 1 }));
+        }
+        get().checkMistakes();
       }
       set({ lastCorrectCell: null });
     }
     
     set({ currentGrid: newGrid});
-   
   },
 
   incrementTimer: () => {
-    if (!get().isComplete &&get().mistakes < get().maxMistakes) {
-      // Solo incrementar el tiempo si el juego no está completo y no se han alcanzado los errores máximos
+    if (!get().isComplete && !get().gameOver && get().mistakes < get().maxMistakes) {
       set(state => ({ timer: state.timer + 1 }));
     }
   },
 
-// El jugador puede pausar el tiempo 
-pausedTime: () => {
-  if (!get().isComplete) {
-    set((state) => ({ isPaused: !state.isPaused }));
-  }
-},
+  pausedTime: () => {
+    if (!get().isComplete && !get().gameOver) {
+      set((state) => ({ isPaused: !state.isPaused }));
+    }
+  },
 
-// El tiempo se pausa cuando comete 3 errores
-  checkMistakes: () => {
-    const { mistakes, maxMistakes } = get();
-    if (mistakes >= maxMistakes) {
-      set({ isPaused: true });
+  // Función mejorada para manejar los errores máximos
+  checkMistakes: async () => {
+    const { mistakes, maxMistakes, gameOver } = get();
+    if (mistakes >= maxMistakes && !gameOver) {
+      set({ 
+        isPaused: true,
+        gameOver: true 
+      });
+      // Aplicar penalización automáticamente
+      await get().applyPenalty();
+    }
+  },
+
+  // Penelalización de puntos
+  applyPenalty: async () => {
+    const { difficulty } = get();
+    try {
+      const currentTotalScore = await AsyncStorage.getItem(`totalScore_${difficulty}`);
+      const currentTotal = currentTotalScore !== null ? parseInt(currentTotalScore) : 0;
+      
+      const penalty = 100;
+      const penalizedScore = Math.max(currentTotal - penalty, 0);
+      
+      await AsyncStorage.setItem(`totalScore_${difficulty}`, String(penalizedScore));
+      
+      // Actualizar el estado local
+      set({ totalScore: penalizedScore });
+      
+      console.log(`Penalty applied: ${penalty} points. New total: ${penalizedScore}`);
+    } catch (error) {
+      console.error('Error applying penalty:', error);
     }
   },
 
   checkCompletion: () => {
-    const { currentGrid, solution } = get();
+    const { currentGrid, solution, gameOver } = get();
+    if (gameOver) return; // No verificar completitud si el juego terminó por errores
+    
     const complete = checkSolution(currentGrid, solution);
     if (complete) {
       set({ isComplete: true });
@@ -167,8 +201,8 @@ pausedTime: () => {
   },
 
   solveOneEmptyCell: () => {
-    const { currentGrid, solution, tip } = get();
-    if (tip <= 0) return; // No resolver si no quedan tips
+    const { currentGrid, solution, tip, gameOver } = get();
+    if (tip <= 0 || gameOver) return;
 
     const newGrid = currentGrid.map(row => [...row]);
     for (let row = 0; row < 9; row++) {
@@ -183,8 +217,24 @@ pausedTime: () => {
     }
   },
 
-  // El jugador puede recibir una pista
   setTip: (tip) => {
     set({ tip }); 
   },
 }));
+
+const difficulties: Difficulty[] = ['easy', 'medium', 'hard'];
+export async function getTotalPointsAcrossDifficulties():Promise<Number>  {
+let totalPoints = 0;
+
+for (const difficulty of difficulties) {
+  try {
+    const storagePoint = await AsyncStorage.getItem(`totalScore_${difficulty}`);
+    const points = storagePoint !== null ? parseInt(storagePoint) : 0;
+    totalPoints += points;
+  } catch (error) {
+    console.error(`Error reading points for difficulty "${difficulty}":`, error);
+  }
+}
+
+ return Promise.resolve(totalPoints);
+}

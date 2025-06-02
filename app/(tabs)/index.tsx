@@ -30,14 +30,16 @@ export default function GameScreen() {
   const backgroundColor = isDarkMode ? '#121212' : '#FFFFFF';
   const textColor = isDarkMode ? '#FFFFFF' : '#000000';
   const subtitleColor = isDarkMode ? '#888' : '#444';
+  
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
       {showRetry && (
         <View style={[styles.container, styles.overlay]}>
-          <Text style={[styles.resumeText, { color: textColor }]}>Has alcanzado el máximo de errores.</Text>
+          <Text style={[styles.gameOverText, { color: themeColor }]}>GAME OVER</Text>
+          <Text style={[styles.resumeText, { color: textColor }]}>You have reached the maximum number of errors.</Text>
           <TouchableOpacity onPress={handleRetry} style={[styles.retryButton, { backgroundColor: themeColor }]}>
-            <Text style={styles.retryText}>Reintentar</Text>
+            <Text style={styles.retryText}>Retry</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -58,7 +60,7 @@ export default function GameScreen() {
       {isPaused && !showRetry && (
         <View style={styles.overlay}>
           <TouchableOpacity onPress={pausedTime} style={[styles.resumeButton, { backgroundColor: themeColor }]}>
-          <Text style={[styles.pausedText, { color: textColor }]}>Reanudar</Text>
+          <Text style={[styles.pausedText, { color: textColor }]}>Resume</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -80,6 +82,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     margin: 16,
+  },
+  gameOverText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   resumeText: {
     fontSize: 18,

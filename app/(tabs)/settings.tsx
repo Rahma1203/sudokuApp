@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
-
 import { useSudokuStore } from '../../store/sudokuStore';
 import type { Difficulty } from '../../utils/sudoku';
+
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function SettingsScreen() {
   const textColor = isDarkMode ? '#FFFFFF' : '#000000';
   const difficultyTextColor = isDarkMode ? '#888' : '#444';
   const difficultyButtonBackground = isDarkMode ? '#2a2a2a' : '#ddd';
+
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -87,12 +88,49 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: textColor }]}>Statistics</Text>
         <TouchableOpacity
-          style={[styles.difficultyButton, { backgroundColor: difficultyButtonBackground }]}
+          style={[
+            styles.statisticsButton,
+            { backgroundColor: difficultyButtonBackground, padding: 7, alignItems: 'center', justifyContent: 'center'},
+            
+          ]}
           onPress={() => {
-            // Handle statistics action here
+            router.push('/statistics');
           }}
+          activeOpacity={0.7}
         >
-          <Text style={[styles.difficultyText, { color: difficultyTextColor }]}>View Statistics</Text>
+          <Text
+            style={[
+              styles.difficultyText,
+              { color: themeColor, fontWeight: 'bold' },
+              { fontSize: 18}, 
+            ]}
+          >
+            View Statistics
+          </Text>
+        </TouchableOpacity>
+      </View>
+       <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: textColor }]}>instructions</Text>
+        <TouchableOpacity
+          style={[
+            styles.statisticsButton,
+            { backgroundColor: difficultyButtonBackground, padding: 7, alignItems: 'center', justifyContent: 'center'},
+            
+          ]}
+          onPress={() => {
+            router.push('/howplay');
+          }}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[
+              styles.difficultyText,
+              { color: themeColor, fontWeight: 'bold' },
+              { fontSize: 18}, 
+            ]}
+          >
+            How to play 
+          </Text>
         </TouchableOpacity>
       </View>
     </View> 
@@ -124,9 +162,16 @@ const styles = StyleSheet.create({
   },
   difficultyButton: {
     flex: 1,
-    padding: 16,
+    padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  statisticsButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonSpacing: {
     marginRight: 12,

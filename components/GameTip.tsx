@@ -1,33 +1,50 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
-import { useSudokuStore } from '../store/sudokuStore';
-import { SudokuGrid } from './SudokuGrid';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import React from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSudokuStore } from '../store/sudokuStore';
 
-export function GameTip() {
+interface GameTipProps {
+  onRequestMoreTips?: () => void;
+}
+
+export function GameTip({ onRequestMoreTips }: GameTipProps) {
   const solveOneEmptyCell = useSudokuStore(state => state.solveOneEmptyCell);
-  const tip  = useSudokuStore(state => state.tip);
+  const tip = useSudokuStore(state => state.tip);
+  const setTip = useSudokuStore(state => state.setTip);
   const themeColor = useSudokuStore(state => state.themeColor);
+
+  const handlePress = () => {
+    if (tip > 0) {
+      // Si hay pistas disponibles, resolvemos una celda
+      solveOneEmptyCell();
+    } else {
+      // Si no hay pistas disponibles, solicitamos el anuncio
+      if (onRequestMoreTips) {
+        onRequestMoreTips();
+      } else if (__DEV__) {
+        // Solo en desarrollo: dar pistas sin anuncio
+        setTip(3);
+        Alert.alert('¡Pistas adicionales!', 'Has recibido 3 pistas adicionales (modo desarrollo)');
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
-    
       <View style={styles.solveButtonContainer}>
         <TouchableOpacity
-        
-          style={[styles.button, styles.solveButton, tip === 0 && styles.disabledButton, { backgroundColor: themeColor }]}
-          onPress={() => {
-            if (tip > 0) solveOneEmptyCell();
-          }}
-          disabled={tip === 0}
+          style={[
+            styles.button, 
+            styles.solveButton, 
+            { backgroundColor: tip > 0 ? themeColor : '#888' }
+          ]}
+          onPress={handlePress}
         >
           <FontAwesome5 name="lightbulb" size={24} color="black" />
         </TouchableOpacity>
-        {tip > 0 && (
-          <View style={styles.tipBadge}>
-            <Text style={styles.tipText}>{tip}</Text>
-          </View>
-        )}
+        <View style={styles.tipBadge}>
+          <Text style={styles.tipText}>{tip}</Text>
+        </View>
       </View>
     </View>
   );
@@ -80,4 +97,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-

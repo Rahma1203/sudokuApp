@@ -8,16 +8,8 @@
     "scheme": "sudoku",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true
-    },
+    
+    
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -32,19 +24,27 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
-          
         }
       ],
       [
-        "react-native-google-mobile-ads",
+        "expo-build-properties",
         {
-          "androidAppId": "ca-app-pub-2379499005569310",
-          "iosAppId": "ca-app-pub-2379499005569310"
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
+      
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e6b6296e-da06-411c-9f8f-0a3ac6066571"
+      }
+    },
+    "owner": "rahhh1203"
   }
 }

@@ -4,7 +4,7 @@ import { useSudokuStore } from '../store/sudokuStore';
 import { Background } from '@react-navigation/elements';
 
 export function SudokuGrid() {
-  const { currentGrid, puzzle, selectedCell, selectCell, isDarkMode } = useSudokuStore();
+  const { currentGrid, puzzle, selectedCell, selectCell, isDarkMode, themeColor } = useSudokuStore();
   
   // Colores dinámicos basados en el modo
   const containerColor = isDarkMode ? "#1a1a1a" : "#f5f5f5";
@@ -38,7 +38,7 @@ export function SudokuGrid() {
         <Text 
           style={[
             styles.cellText, 
-            { color: numberColor },
+            { color: themeColor },
             isOriginal && { color: originalNumberColor, fontWeight: 'bold' }
           ]}
         > 
