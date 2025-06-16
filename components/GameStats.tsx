@@ -41,11 +41,7 @@ export function GameStats() {
           <Text style={[styles.value, maxMistakes > 0 && styles.errorText, { color: themeColor }]}>/{maxMistakes}</Text>
         </View>
       </View>
-      {isComplete && (
-        <View style={[styles.completeContainer, { backgroundColor: themeColor }]}>
-          <Text style={styles.completeText}>¡Completed!</Text>
-        </View>
-      )}
+      
       <View style={styles.stat}>
         <Text style={styles.label}>Time</Text>
         <Text style={[styles.value,{ color: themeColor } ]}>{formatTime(timer)}</Text>

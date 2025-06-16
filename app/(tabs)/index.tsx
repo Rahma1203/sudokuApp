@@ -64,6 +64,18 @@ export default function GameScreen() {
           </TouchableOpacity>
         </View>
       )}
+      {isComplete && !showRetry && (
+        <View style={[styles.overlay, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={[styles.gameOverText, { color: themeColor }]}>Congratulations!</Text>
+          <Text style={[styles.resumeText, { color: textColor }]}>You completed the game!</Text>
+          <TouchableOpacity onPress={async () => {
+            await useSudokuStore.getState().saveCurrentPoints();
+            useSudokuStore.getState().newGame();
+          }} style={[styles.retryButton, { backgroundColor: themeColor }]}>
+            <Text style={styles.retryText}>Play Again</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }

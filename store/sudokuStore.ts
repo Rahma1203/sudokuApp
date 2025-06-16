@@ -20,13 +20,14 @@ interface SudokuState {
   tip:number;
   themeColor: string;
   isDarkMode: boolean;
-  gameOver: boolean; // Nuevo estado para controlar cuando se acaban los intentos
+  gameOver: boolean; // controlar cuando se acaban los intentos
   toggleDarkMode: () => void;
   resetCurrentGame: () => void;
   pausedTime: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
   setThemeColor: (color: string) => void;
   newGame: () => void;
+  saveCurrentPoints: () => Promise<void>;
   setTip: (tip: number) => void;
   selectCell: (row: number, col: number) => void;
   setNumber: (number: number) => void;
@@ -90,6 +91,20 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
     });
   },
 
+  saveCurrentPoints: async () => {
+    const { points, difficulty } = get();
+    try {
+      const currentTotalScore = await AsyncStorage.getItem(`totalScore_${difficulty}`);
+      const currentTotal = currentTotalScore !== null ? parseInt(currentTotalScore) : 0;
+      const newTotalScore = currentTotal + points;
+      await AsyncStorage.setItem(`totalScore_${difficulty}`, String(newTotalScore));
+      set({ totalScore: newTotalScore });
+      console.log('Points saved successfully:', { points, difficulty, newTotalScore });
+    } catch (error) {
+      console.error('Error saving current points:', error);
+    }
+  },
+
   resetCurrentGame: () => {
     const { puzzle } = get();
     set({
@@ -139,9 +154,11 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
         get().checkMistakes();
       }
       set({ lastCorrectCell: null });
+      
     }
     
     set({ currentGrid: newGrid});
+    get().checkCompletion() ;
   },
 
   incrementTimer: () => {
@@ -200,6 +217,7 @@ export const useSudokuStore = create<SudokuState>((set, get) => ({
     }
   },
 
+  
   solveOneEmptyCell: () => {
     const { currentGrid, solution, tip, gameOver } = get();
     if (tip <= 0 || gameOver) return;

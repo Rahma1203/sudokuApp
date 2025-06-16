@@ -75,7 +75,7 @@ export function generateSudoku(difficulty: Difficulty): {
 
   const puzzle = solution.map(row => [...row]);
   const cellsToRemove = {
-    easy: 30,
+    easy: 1,
     medium: 40,
     hard:50,
     expert:70,
