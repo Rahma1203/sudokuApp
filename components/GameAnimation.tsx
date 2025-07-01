@@ -43,7 +43,7 @@ export function GameAnimation() {
   
 
 
-  // Calculatar posicion de la animacion
+  // Calcular posicion de la animacion
   
 
   const top = lastCorrectCell.row * 38; // 36 + 2 margin approx
