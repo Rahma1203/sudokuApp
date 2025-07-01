@@ -42,8 +42,10 @@ export function GameAnimation() {
 
   
 
-  // Calculate posicion de la animacion
+
+  // Calculatar posicion de la animacion
   
+
   const top = lastCorrectCell.row * 38; // 36 + 2 margin approx
   const left = lastCorrectCell.col * 38;
   const pointsText = difficulty === 'easy' ? '+10' : difficulty === 'medium' ? '+20' : '+30';
