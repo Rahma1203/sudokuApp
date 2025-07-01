@@ -15,10 +15,10 @@ export function GameTip({ onRequestMoreTips }: GameTipProps) {
 
   const handlePress = () => {
     if (tip > 0) {
-      // Si hay pistas disponibles, resolvemos una celda
+      // Si hay pistas disponibles, resolver una celda
       solveOneEmptyCell();
     } else {
-      // Si no hay pistas disponibles, solicitamos el anuncio
+      // Si no hay pistas disponibles, solicitar el anuncio
       if (onRequestMoreTips) {
         onRequestMoreTips();
       } else if (__DEV__) {

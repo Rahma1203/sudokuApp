@@ -8,17 +8,17 @@ export function createEmptyGrid(): SudokuGrid {
 }
 
 function isValid(grid: SudokuGrid, row: number, col: number, num: number): boolean {
-  // Check row
+  // Check filas
   for (let x = 0; x < GRID_SIZE; x++) {
     if (grid[row][x] === num) return false;
   }
 
-  // Check column
+  // Check columnas
   for (let x = 0; x < GRID_SIZE; x++) {
     if (grid[x][col] === num) return false;
   }
 
-  // Check 3x3 box
+  // Check 3x3 
   const startRow = row - (row % 3);
   const startCol = col - (col % 3);
   for (let i = 0; i < 3; i++) {
@@ -75,7 +75,7 @@ export function generateSudoku(difficulty: Difficulty): {
 
   const puzzle = solution.map(row => [...row]);
   const cellsToRemove = {
-    easy: 1,
+    easy: 20,
     medium: 40,
     hard:50,
     expert:70,
@@ -124,8 +124,8 @@ function solveSingleCell(grid: SudokuGrid, row: number, col: number): boolean {
 
 export function isCellValid(grid: SudokuGrid, row: number, col: number, value: number): boolean {
   const originalValue = grid[row][col];
-  grid[row][col] = 0; // Temporarily set the cell to 0
+  grid[row][col] = 0; 
   const valid = isValid(grid, row, col, value);
-  grid[row][col] = originalValue; // Restore the original value
+  grid[row][col] = originalValue; 
   return valid;
 }
