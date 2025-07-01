@@ -42,8 +42,7 @@ export function GameAnimation() {
 
   
 
-  // Calculate position for animation based on cell row and col
-  // Assuming each cell is 36x36 with 1 margin, adjust as needed
+//Calcular la posicion de la animacion del puntuaje
   const top = lastCorrectCell.row * 38; // 36 + 2 margin approx
   const left = lastCorrectCell.col * 38;
   const pointsText = difficulty === 'easy' ? '+10' : difficulty === 'medium' ? '+20' : '+30';
