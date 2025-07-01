@@ -35,10 +35,10 @@ interface SudokuState {
   checkCompletion: () => void;
   checkMistakes: () => void;
   solveOneEmptyCell: () => void;
-  applyPenalty: () => Promise<void>; // Nueva función para aplicar penalización
+  applyPenalty: () => Promise<void>; // Función para aplicar penalización
 }
 
-// Create initial empty grid
+
 const createInitialGrid = (): SudokuGrid => Array(9).fill(null).map(() => Array(9).fill(0));
 
 const initialGrid = createInitialGrid();
